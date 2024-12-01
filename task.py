@@ -35,9 +35,8 @@ class Task:
         )
 
     def __str__(self):
-        return f"\nid: {self.id}\n" + \
-            f"Название: {self.title}\n" + \
-            f"Описание: {self.description}\n" + \
+        return f"{self.id} | {self.title}\n" + \
+            f"{self.description}\n" + \
             f"Категория: {self.category}\n" + \
             f"Срок выполнения: {self.due_date}\n" + \
             f"Приоритет: {self.priority}\n" + \

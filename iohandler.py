@@ -1,11 +1,13 @@
 import datetime
 import os
 
+from colorama import Fore
+
 from task_manager import TaskManager
 
 
 class IOHandler:
-    def __init__(self, tm: TaskManager):
+    def __init__(self, tm: TaskManager = TaskManager()):
         self.tm = tm
 
     def get_tasks(self, **kwargs):
@@ -13,8 +15,11 @@ class IOHandler:
         if not tasks:
             print("Задачи не найдены.")
             return
+
+        print('~' * 42)
         for task in tasks:
             print(task)
+            print('~' * 42)
 
     def get_cat_tasks(self):
         cat = input('Введите категорию')

@@ -1,8 +1,8 @@
 from iohandler import IOHandler
-from task_manager import TaskManager
+from colorama import Style, Fore
 
-manager = TaskManager('tasks.json')
-display = IOHandler(manager)
+display = IOHandler()
+
 actions = {
     1: ('Все задачи', display.get_tasks),
     2: ('Задачи по категории', display.get_cat_tasks),
@@ -18,19 +18,22 @@ actions = {
 def main():
     display.clear()
     while True:
-        print("\nМенеджер задач")
+        print(Fore.YELLOW + "\nМенеджер задач")
         for act in actions:
-            print(act, actions[act][0], sep='. ')
+            print(f'{act}. {actions[act][0]}')
+        print(Fore.RESET)
 
-        action = input("Выберите действие: ")
+        action = int(input("Выберите действие:\n"))
         display.clear()
 
         if action in actions:
-            description, func = actions[int(action)]
-            print(f'Действие: {description}')
+            description, func = actions[action]
+            print(Fore.GREEN + f'Действие: {description}')
+            print(Fore.RESET)
             func()
         else:
-            print("Не понял тебя. Попробуй снова.")
+            print(Fore.RED + "Не понял тебя. Попробуй снова.")
+            print(Style.RESET_ALL)
 
 
 if __name__ == "__main__":
