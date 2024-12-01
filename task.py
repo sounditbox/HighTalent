@@ -37,7 +37,7 @@ class Task:
     def __str__(self):
         return f"{self.id} | {self.title}\n" + \
             f"{self.description}\n" + \
-            f"Категория: {self.category}\n" + \
-            f"Срок выполнения: {self.due_date}\n" + \
-            f"Приоритет: {self.priority}\n" + \
-            f"Статус: {self.status}\n"
+            f"📋: {self.category}\n" + \
+            f"📅: {self.due_date}\n" + \
+            f"⚡: {self.priority}\n" + \
+            f"✅: {self.status}\n"

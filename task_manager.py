@@ -1,5 +1,7 @@
 import json
 import os
+
+from exceptions import TaskNotFound
 from task import Task
 
 
@@ -8,11 +10,11 @@ class TaskManager:
 
     def __init__(self, filename: str = 'tasks.json'):
         self.filename = filename
-        self.tasks: list[Task] = self.load_tasks()
+        self.tasks: list[Task] = self._load_tasks()
 
-    def load_tasks(self) -> list[Task]:
+    def _load_tasks(self) -> list[Task]:
         if not os.path.exists(self.filename):
-            self.save_tasks()
+            self._save_tasks()
         with open(self.filename, 'r', encoding='utf-8') as file:
             tasks = json.load(file)
             if tasks:
@@ -20,17 +22,20 @@ class TaskManager:
                 return [Task.from_dict(task) for task in tasks]
         return []
 
-    def save_tasks(self):
+    def _save_tasks(self) -> None:
         with open(self.filename, 'w', encoding='utf-8') as file:
             json.dump([task.to_dict() for task in self.tasks], file,
                       ensure_ascii=False, indent=4)
+
+    def get_tasks(self) -> list[Task]:
+        return self.tasks
 
     def add_task(self, title, description, category, due_date, priority) -> Task:
         TaskManager.next_id += 1  # Автоинкремент
         task = Task(TaskManager.next_id, title, description, category, due_date,
                     priority)
         self.tasks.append(task)
-        self.save_tasks()
+        self._save_tasks()
         return task
 
     def edit_task(self, task_id, **kwargs) -> bool:
@@ -38,15 +43,15 @@ class TaskManager:
         if task:
             for key, value in kwargs.items():
                 setattr(task, key, value)
-            self.save_tasks()
+            self._save_tasks()
             return True
-        return False
+        raise TaskNotFound
 
     def delete_task(self, task_id) -> bool:
         task = self.get_task_by_id(task_id)
         if task:
             self.tasks.remove(task)
-            self.save_tasks()
+            self._save_tasks()
             return True
         return False
 
@@ -63,10 +68,10 @@ class TaskManager:
             results = [task for task in results if task.status == status]
         return results
 
-    def mark_task_completed(self, task_id) -> bool:
+    def complete_task(self, task_id) -> bool:
         return self.edit_task(task_id, status="Выполнена")
 
-    def get_tasks(self, **kwargs) -> list[Task]:
+    def get_tasks_by_cat(self, **kwargs) -> list[Task]:
         if 'category' in kwargs:
             return [task for task in self.tasks if task.category == kwargs['category']]
         return []

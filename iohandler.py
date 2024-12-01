@@ -1,5 +1,8 @@
 import datetime
 import os
+
+from exceptions import TaskNotFound
+from settings import DELIMITER
 from task_manager import TaskManager
 
 
@@ -10,13 +13,12 @@ class IOHandler:
     def get_tasks(self, **kwargs):
         tasks = self.tm.get_tasks(**kwargs)
         if not tasks:
-            print("Задачи не найдены.")
-            return
+            raise TaskNotFound
 
-        print('~' * 42)
+        print(DELIMITER)
         for task in tasks:
             print(task)
-            print('~' * 42)
+            print(DELIMITER)
 
     def get_cat_tasks(self):
         cat = input('Введите категорию:\n')
@@ -69,10 +71,10 @@ class IOHandler:
         try:
             task_id = int(
                 input("Введите ID задачи для отметки как выполненной: "))
-            if self.tm.mark_task_completed(task_id):
+            if self.tm.complete_task(task_id):
                 print("Задача отмечена как выполненная.")
             else:
-                print("Задача не найдена.")
+                raise TaskNotFound
         except Exception as e:
             print(f"Ошибка: {e}")
 
@@ -100,5 +102,5 @@ class IOHandler:
 
     def exit(self):
         print('Пока-пока')
-        self.tm.save_tasks()
+        self.tm._save_tasks()
         exit()

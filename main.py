@@ -1,21 +1,21 @@
 from iohandler import IOHandler
 from colorama import Style, Fore
 
-display = IOHandler()
-
-actions = {
-    1: ('Все задачи', display.get_tasks),
-    2: ('Задачи по категории', display.get_cat_tasks),
-    3: ('Добавить задачу', display.add_task),
-    4: ('Редактировать задачу', display.edit_task),
-    5: ('Выполнить задачу', display.complete_task),
-    6: ('Удалить задачу', display.delete_task),
-    7: ('Поиск задач', display.find_task),
-    0: ('Выход', display.exit),
-}
-
 
 def main():
+    display = IOHandler()
+
+    actions = {
+        1: ('Все задачи', display.get_tasks),
+        2: ('Задачи по категории', display.get_cat_tasks),
+        3: ('Добавить задачу', display.add_task),
+        4: ('Редактировать задачу', display.edit_task),
+        5: ('Выполнить задачу', display.complete_task),
+        6: ('Удалить задачу', display.delete_task),
+        7: ('Поиск задач', display.find_task),
+        0: ('Выход', display.exit),
+    }
+
     display.clear()
     while True:
         print(Fore.YELLOW + "\nМенеджер задач")
