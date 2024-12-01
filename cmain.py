@@ -97,32 +97,33 @@ p_search.add_argument(
 
 args = parser.parse_args()
 
-if args.command == 'add':
-    task_manager.add_task(args.title, args.description, args.category,
-                          args.due_date, args.priority)
-elif args.command == 'list':
-    if args.category:
-        tasks = task_manager.get_tasks_by_cat(category=args.category)
-    else:
-        tasks = task_manager.get_tasks()
+match args.command:
+    case 'add':
+        task_manager.add_task(args.title, args.description, args.category,
+                              args.due_date, args.priority)
+    case 'list':
+        if args.category:
+            tasks = task_manager.get_tasks_by_cat(category=args.category)
+        else:
+            tasks = task_manager.get_tasks()
 
-    print(DELIMITER)
-    print((DELIMITER + '\n').join(str(t) for t in tasks))
-    print(DELIMITER)
-elif args.command == 'edit':
-    data = {
-        'title': args.title,
-        'description': args.description,
-        'category': args.category,
-        'due_date': args.due_date,
-        'priority': args.priority
-    }
-    task_manager.edit_task(args.id, **data)
-elif args.command == 'complete':
-    task_manager.complete_task(args.id)
-elif args.command == 'delete':
-    task_manager.delete_task(args.id)
-elif args.command == 'search':
-    task_manager.search_tasks(**args)
-else:
-    parser.print_help()
+        print(DELIMITER)
+        print((DELIMITER + '\n').join(str(t) for t in tasks))
+        print(DELIMITER)
+    case 'edit':
+        data = {
+            'title': args.title,
+            'description': args.description,
+            'category': args.category,
+            'due_date': args.due_date,
+            'priority': args.priority
+        }
+        task_manager.edit_task(args.id, **data)
+    case 'complete':
+        task_manager.complete_task(args.id)
+    case 'delete':
+        task_manager.delete_task(args.id)
+    case 'search':
+        task_manager.search_tasks(**args)
+    case _:
+        parser.print_help()
