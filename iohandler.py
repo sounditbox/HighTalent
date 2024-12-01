@@ -1,8 +1,5 @@
 import datetime
 import os
-
-from colorama import Fore
-
 from task_manager import TaskManager
 
 
@@ -22,7 +19,7 @@ class IOHandler:
             print('~' * 42)
 
     def get_cat_tasks(self):
-        cat = input('Введите категорию')
+        cat = input('Введите категорию:\n')
         self.get_tasks(category=cat)
 
     def add_task(self):
