@@ -1,6 +1,7 @@
 import argparse
 
 from constants import DELIMITER
+from priority import Priority
 from task_manager import TaskManager
 
 task_manager = TaskManager()
@@ -28,7 +29,7 @@ p_add.add_argument(
 )
 p_add.add_argument(
     '--priority', required=True,
-    choices=['Низкий', 'Средний', 'Высокий'],
+    choices=Priority.list(),
     help='Приоритет задачи'
 )
 
@@ -63,7 +64,7 @@ p_edit.add_argument(
 )
 p_edit.add_argument(
     '--priority',
-    help='Новый приоритет задачи', choices=['Низкий', 'Средний', 'Высокий']
+    help='Новый приоритет задачи', choices=Priority.list()
 )
 
 # Команда для отметки задачи как выполненной

@@ -1,8 +1,9 @@
 import datetime
 import os
 
-from exceptions import TaskNotFound
 from constants import DELIMITER
+from exceptions import TaskNotFound
+from task import Task
 from task_manager import TaskManager
 
 
@@ -10,19 +11,23 @@ class IOHandler:
     def __init__(self, tm: TaskManager = TaskManager()):
         self.tm = tm
 
-    def get_tasks(self, **kwargs):
-        tasks = self.tm.get_tasks(**kwargs)
+    def get_tasks(self):
+        tasks = self.tm.get_tasks()
+        self.print_tasks(tasks)
+
+    def get_cat_tasks(self):
+        cat = input('Введите категорию:\n')
+        tasks = self.tm.get_tasks_by(category=cat)
+        self.print_tasks(tasks)
+
+    @staticmethod
+    def print_tasks(tasks: list[Task]):
         if not tasks:
-            raise TaskNotFound
+            print('Задачи не найдены.')
 
         print(DELIMITER)
         for task in tasks:
             print(task)
-            print(DELIMITER)
-
-    def get_cat_tasks(self):
-        cat = input('Введите категорию:\n')
-        self.get_tasks(category=cat)
 
     def add_task(self):
         try:
@@ -93,7 +98,7 @@ class IOHandler:
                                      category=category or None,
                                      status=status or None)
         # ???
-        self.get_tasks(tasks)
+        self.print_tasks(tasks)
 
     def exit(self):
         print('Пока-пока')

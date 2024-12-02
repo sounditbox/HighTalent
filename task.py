@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from priority import Priority
+
 
 @dataclass
 class Task:
@@ -8,7 +10,7 @@ class Task:
     description: str
     category: str
     due_date: str
-    priority: str
+    priority: Priority
     status: str = "Не выполнена"
 
     def to_dict(self):
@@ -18,7 +20,7 @@ class Task:
             "description": self.description,
             "category": self.category,
             "due_date": self.due_date,
-            "priority": self.priority,
+            "priority": self.priority.value,
             "status": self.status
         }
 
@@ -30,7 +32,7 @@ class Task:
             description=data["description"],
             category=data["category"],
             due_date=data["due_date"],
-            priority=data["priority"],
+            priority=Priority(data["priority"]),
             status=data.get("status", "Не выполнена")
         )
 

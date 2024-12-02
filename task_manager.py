@@ -2,6 +2,7 @@ import json
 import os
 
 from exceptions import TaskNotFound
+from priority import Priority
 from task import Task
 
 
@@ -29,11 +30,14 @@ class TaskManager:
         """
         if not os.path.exists(self.filename):
             self._save_tasks()
-        with open(self.filename, 'r', encoding='utf-8') as file:
-            tasks = json.load(file)
-            if tasks:
-                TaskManager.next_id = max(tasks, key=lambda t: t['id'])['id']
-                return [Task.from_dict(task) for task in tasks]
+        try:
+            with open(self.filename, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+                if tasks:
+                    TaskManager.next_id = max(tasks, key=lambda t: t['id'])['id']
+                    return [Task.from_dict(task) for task in tasks]
+        except json.JSONDecodeError as e:
+            print(f"Error loading tasks: {e}")
         return []
 
     def _save_tasks(self) -> None:
@@ -70,7 +74,7 @@ class TaskManager:
         """
         TaskManager.next_id += 1
         task = Task(TaskManager.next_id, title, description, category, due_date,
-                    priority)
+                    Priority(priority))
         self.tasks.append(task)
         self._save_tasks()
         return task
@@ -93,6 +97,8 @@ class TaskManager:
         if not task:
             raise TaskNotFound
         for key, value in kwargs.items():
+            if not hasattr(task, key):
+                raise ValueError(f"Invalid attribute: {key}")
             setattr(task, key, value)
         self._save_tasks()
         return True
