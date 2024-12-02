@@ -4,3 +4,11 @@ class TaskManagerException(Exception):
 
 class TaskNotFound(TaskManagerException):
     message = 'Задача не найдена'
+
+
+class DateTimeException(TaskManagerException):
+    pass
+
+
+class InvalidDate(DateTimeException):
+    pass

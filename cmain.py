@@ -1,6 +1,6 @@
 import argparse
 
-from settings import DELIMITER
+from constants import DELIMITER
 from task_manager import TaskManager
 
 task_manager = TaskManager()
@@ -103,7 +103,7 @@ match args.command:
                               args.due_date, args.priority)
     case 'list':
         if args.category:
-            tasks = task_manager.get_tasks_by_cat(category=args.category)
+            tasks = task_manager.get_tasks_by(category=args.category)
         else:
             tasks = task_manager.get_tasks()
 

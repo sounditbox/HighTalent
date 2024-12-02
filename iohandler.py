@@ -2,7 +2,7 @@ import datetime
 import os
 
 from exceptions import TaskNotFound
-from settings import DELIMITER
+from constants import DELIMITER
 from task_manager import TaskManager
 
 
@@ -50,16 +50,11 @@ class IOHandler:
             if not task:
                 print("Задача не найдена.")
                 return
-            title = input(
-                f"Введите новое название ({task.title}): ") or task.title
-            description = input(
-                f"Введите новое описание ({task.description}): ") or task.description
-            category = input(
-                f"Введите новую категорию ({task.category}): ") or task.category
-            due_date = input(
-                f"Введите новый срок выполнения ({task.due_date}): ") or task.due_date
-            priority = input(
-                f"Введите новый приоритет ({task.priority}): ") or task.priority
+            title = input(f"Введите новое название ({task.title}): ") or task.title
+            description = input(f"Введите новое описание ({task.description}): ") or task.description
+            category = input(f"Введите новую категорию ({task.category}): ") or task.category
+            due_date = input(f"Введите новый срок выполнения ({task.due_date}): ") or task.due_date
+            priority = input(f"Введите новый приоритет ({task.priority}): ") or task.priority
             self.tm.edit_task(task_id, title=title, description=description,
                               category=category, due_date=due_date,
                               priority=priority)
