@@ -20,7 +20,6 @@ Python 3.7 или выше
 
 ```
 git clone https://github.com/sounditbox/HighTalentTest.git
-cd task-manager
 ```
 
 ## Установите необходимые зависимости:
