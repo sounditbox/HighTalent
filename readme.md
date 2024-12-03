@@ -19,7 +19,7 @@ Python 3.7 или выше
 Клонируйте репозиторий или скачайте архив с кодом:
 
 ```
-git clone https://github.com/sounditbox/HighTalentTest.git
+git clone https://github.com/sounditbox/HighTalent.git
 ```
 
 ## Установите необходимые зависимости:
