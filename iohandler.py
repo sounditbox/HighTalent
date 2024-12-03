@@ -1,92 +1,115 @@
 import datetime
 import os
 
-from constants import DELIMITER
-from exceptions import TaskNotFound
+from colorama import Style, Fore
+
+from constants import DELIMITER, BASE_EXCEPTION_MESSAGE
+from exceptions import TaskManagerException
 from task import Task
 from task_manager import TaskManager
 
 
 class IOHandler:
-    def __init__(self, tm: TaskManager = TaskManager()):
-        self.tm = tm
+    tm: TaskManager = TaskManager()
+
+    @staticmethod
+    def clear():
+        os.system('cls') if os.name == 'nt' else os.system('clear')
+
+    @staticmethod
+    def exit():
+        print('Пока-пока')
+        exit()
 
     def get_tasks(self):
         tasks = self.tm.get_tasks()
-        self.print_tasks(tasks)
+        self.print_(tasks)
 
     def get_cat_tasks(self):
         cat = input('Введите категорию:\n')
         tasks = self.tm.get_tasks_by(category=cat)
-        self.print_tasks(tasks)
+        self.print_(tasks)
 
     @staticmethod
-    def print_tasks(tasks: list[Task]):
+    def print_(tasks: list[Task]):
         if not tasks:
             print('Задачи не найдены.')
 
         print(DELIMITER)
         for task in tasks:
             print(task)
+            print(DELIMITER)
 
-    def add_task(self):
-        try:
+    def add_task(self, **kwargs):
+        if not kwargs:
             title = input("Введите название: ")
             description = input("Введите описание: ")
             category = input("Введите категорию: ")
             due_date = input("Введите срок выполнения (ГГГГ-ММ-ДД): ")
-            datetime.datetime.strptime(due_date, '%Y-%m-%d')  # Проверка даты
+            due_date = datetime.datetime.strptime(due_date, '%Y-%m-%d')
             priority = input("Введите приоритет (Низкий, Средний, Высокий): ")
-            if priority not in ["Низкий", "Средний", "Высокий"]:
-                raise ValueError("Неверный приоритет")
-            self.tm.add_task(title, description, category, due_date, priority)
-            print("Задача добавлена успешно.")
-        except Exception as e:
-            print(f"Ошибка при добавлении задачи: {e}")
-
-    @staticmethod
-    def clear():
-        os.system('cls') if os.name == 'nt' else os.system('clear')
-
-    def edit_task(self):
+        else:
+            title = kwargs.get('title')
+            description = kwargs.get('description')
+            category = kwargs.get('category')
+            due_date = kwargs.get('due_date')
+            priority = kwargs.get('priority')
         try:
+            self.tm.add_task(title, description, category, due_date, priority)
+        except TaskManagerException as e:
+            print(BASE_EXCEPTION_MESSAGE, e)
+        else:
+            print("Задача добавлена успешно.")
+
+    def edit_task(self, **kwargs):
+        if not kwargs:
             task_id = int(input("Введите ID задачи для редактирования: "))
             task = self.tm.get_task_by_id(task_id)
-            if not task:
-                print("Задача не найдена.")
-                return
-            title = input(f"Введите новое название ({task.title}): ") or task.title
-            description = input(f"Введите новое описание ({task.description}): ") or task.description
-            category = input(f"Введите новую категорию ({task.category}): ") or task.category
-            due_date = input(f"Введите новый срок выполнения ({task.due_date}): ") or task.due_date
-            priority = input(f"Введите новый приоритет ({task.priority}): ") or task.priority
+            title = input(
+                f"Введите новое название ({task.title}): ") or task.title
+            description = input(
+                f"Введите новое описание ({task.description}): ") or task.description
+            category = input(
+                f"Введите новую категорию ({task.category}): ") or task.category
+            due_date = input(
+                f"Введите новый срок выполнения ({task.due_date}): ") or task.due_date
+            priority = input(
+                f"Введите новый приоритет ({task.priority}): ") or task.priority
+        else:
+            task_id = kwargs.get('id')
+            title = kwargs.get('title')
+            description = kwargs.get('description')
+            category = kwargs.get('category')
+            due_date = kwargs.get('due_date')
+            priority = kwargs.get('priority')
+        try:
             self.tm.edit_task(task_id, title=title, description=description,
                               category=category, due_date=due_date,
                               priority=priority)
+        except TaskManagerException as e:
+            print(BASE_EXCEPTION_MESSAGE, e)
+        else:
             print(f"Задача {task_id} обновлена успешно.")
-        except Exception as e:
-            print(f"Ошибка при редактировании задачи: {e}")
 
-    def complete_task(self):
+    def complete_task(self, task_id=None):
+        if not task_id:
+            task_id = int(input("Введите ID задачи:\n"))
         try:
-            task_id = int(
-                input("Введите ID задачи для отметки как выполненной: "))
-            if self.tm.complete_task(task_id):
-                print("Задача отмечена как выполненная.")
-            else:
-                raise TaskNotFound
-        except Exception as e:
-            print(f"Ошибка: {e}")
+            self.tm.complete_task(task_id)
+        except TaskManagerException as e:
+            print("Ошибка выполнения задачи:", e)
+        else:
+            print("Задача отмечена как выполненная.")
 
-    def delete_task(self):
+    def delete_task(self, t_id=None):
+        if not t_id:
+            t_id = int(input("Введите ID задачи для удаления: "))
         try:
-            task_id = int(input("Введите ID задачи для удаления: "))
-            if self.tm.delete_task(task_id):
-                print("Задача удалена.")
-            else:
-                print("Задача не найдена.")
-        except Exception as e:
-            print(f"Ошибка: {e}")
+            self.tm.delete_task(t_id)
+        except TaskManagerException as e:
+            print(BASE_EXCEPTION_MESSAGE, e)
+        else:
+            print("Задача удалена.")
 
     def find_task(self):
         keyword = input(
@@ -94,13 +117,41 @@ class IOHandler:
         category = input("Введите категорию для поиска (или оставьте пустым): ")
         status = input(
             "Введите статус для поиска (Выполнена/Не выполнена или оставьте пустым): ")
-        tasks = self.tm.search_tasks(keyword=keyword or None,
-                                     category=category or None,
-                                     status=status or None)
-        # ???
-        self.print_tasks(tasks)
+        tasks = self.tm.find_task(keyword=keyword or None,
+                                  category=category or None,
+                                  status=status or None)
+        self.print_(tasks)
 
-    def exit(self):
-        print('Пока-пока')
-        self.tm._save_tasks()
-        exit()
+    def interactive(self):
+        actions = {
+            1: ('Все задачи', self.get_tasks),
+            2: ('Задачи по категории', self.get_cat_tasks),
+            3: ('Добавить задачу', self.add_task),
+            4: ('Редактировать задачу', self.edit_task),
+            5: ('Выполнить задачу', self.complete_task),
+            6: ('Удалить задачу', self.delete_task),
+            7: ('Поиск задач', self.find_task),
+            0: ('Выход', self.exit),
+        }
+
+        self.clear()
+        while True:
+            print(Fore.YELLOW + "\nМенеджер задач")
+            for act in actions:
+                print(f'{act}. {actions[act][0]}')
+            print(Fore.RESET)
+
+            action = int(input("Выберите действие:\n"))
+            self.clear()
+
+            if action in actions:
+                description, func = actions[action]
+                print(Fore.GREEN + f'Действие: {description}')
+                print(Fore.RESET)
+                func()
+            else:
+                print(Fore.RED + "Не понял тебя. Попробуй снова.")
+                print(Style.RESET_ALL)
+
+    def get_tasks_by(self, category):
+        self.tm.get_tasks_by(category=category)

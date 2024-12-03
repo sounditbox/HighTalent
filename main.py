@@ -1,40 +1,95 @@
+import argparse
+
 from iohandler import IOHandler
-from colorama import Style, Fore
+from priority import Priority
+from task_manager import TaskManager
 
+task_manager = TaskManager()
 
-def main():
-    display = IOHandler()
+parser = argparse.ArgumentParser(description='Менеджер задач')
+subparsers = parser.add_subparsers(dest='command', help='Доступные команды')
 
-    actions = {
-        1: ('Все задачи', display.get_tasks),
-        2: ('Задачи по категории', display.get_cat_tasks),
-        3: ('Добавить задачу', display.add_task),
-        4: ('Редактировать задачу', display.edit_task),
-        5: ('Выполнить задачу', display.complete_task),
-        6: ('Удалить задачу', display.delete_task),
-        7: ('Поиск задач', display.find_task),
-        0: ('Выход', display.exit),
-    }
+# Команда для добавления задачи
+p_add = subparsers.add_parser('add', help='Добавить новую задачу')
+p_add.add_argument('--title',
+                   required=True, help='Название задачи')
+p_add.add_argument('--description',
+                   required=True, help='Описание задачи')
 
-    display.clear()
-    while True:
-        print(Fore.YELLOW + "\nМенеджер задач")
-        for act in actions:
-            print(f'{act}. {actions[act][0]}')
-        print(Fore.RESET)
+p_add.add_argument('--category',
+                   required=True, help='Категория задачи')
+p_add.add_argument('--due_date',
+                   required=True, help='Срок выполнения (ГГГГ-ММ-ДД)')
+p_add.add_argument('--priority', required=True,
+                   choices=Priority.list(), help='Приоритет задачи')
 
-        action = int(input("Выберите действие:\n"))
-        display.clear()
+# Команда для просмотра задач
+p_list = subparsers.add_parser('list', help='Просмотр задач')
+p_list.add_argument('--category',
+                    help='Категория для отображения задач')
 
-        if action in actions:
-            description, func = actions[action]
-            print(Fore.GREEN + f'Действие: {description}')
-            print(Fore.RESET)
-            func()
+# Команда для редактирования задачи
+p_edit = subparsers.add_parser('edit', help='Редактировать задачу')
+p_edit.add_argument('--id', required=True, type=int,
+                    help='ID задачи для редактирования')
+p_edit.add_argument('--title', help='Новое название задачи')
+p_edit.add_argument('--description', help='Новое описание задачи')
+p_edit.add_argument('--category', help='Новая категория задачи')
+p_edit.add_argument('--due_date',
+                    help='Новый срок выполнения (ГГГГ-ММ-ДД)')
+p_edit.add_argument('--priority', help='Новый приоритет задачи',
+                    choices=Priority.list())
+
+# Команда для отметки задачи как выполненной
+p_complete = subparsers.add_parser('complete',
+                                   help='Отметить задачу как выполненную')
+p_complete.add_argument('--id', required=True, type=int,
+                        help='ID задачи для отметки как выполненной')
+
+# Команда для удаления задачи
+p_delete = subparsers.add_parser('delete', help='Удалить задачу')
+p_delete.add_argument('--id', type=int, help='ID задачи для удаления')
+p_delete.add_argument('--category', help='Категория задач для удаления')
+
+# Команда для поиска задач
+p_search = subparsers.add_parser('search', help='Поиск задач')
+p_search.add_argument('--keyword', help='Ключевое слово для поиска')
+p_search.add_argument('--category', help='Категория для поиска')
+p_search.add_argument('--status', choices=['Выполнена', 'Не выполнена'],
+                      help='Статус задачи для поиска')
+
+# Команда для интерактивного режима
+p_interactive = subparsers.add_parser('it',
+                                      help='Режим интерактивного взаимодействия')
+args = parser.parse_args()
+
+display = IOHandler()
+
+match args.command:
+    case 'it':
+        display.interactive()
+    case 'add':
+        display.add_task(**vars(args))
+    case 'list':
+        if args.category:
+            tasks = display.get_tasks_by(category=args.category)
         else:
-            print(Fore.RED + "Не понял тебя. Попробуй снова.")
-            print(Style.RESET_ALL)
-
-
-if __name__ == "__main__":
-    main()
+            tasks = display.get_tasks()
+    case 'edit':
+        data = {
+            'id': args.id,
+            'title': args.title,
+            'description': args.description,
+            'category': args.category,
+            'due_date': args.due_date,
+            'priority': args.priority
+        }
+        display.edit_task(**data)
+    case 'complete':
+        display.complete_task(args.id)
+    case 'delete':
+        display.delete_task(args.id)
+    case 'search':
+        display.find_task(**args)
+    case _:
+        parser.print_help()

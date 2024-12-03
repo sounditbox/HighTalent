@@ -1,7 +1,7 @@
 import json
 import os
 
-from exceptions import TaskNotFound
+from exceptions import TaskNotFound, InvalidPriority
 from priority import Priority
 from task import Task
 
@@ -73,8 +73,11 @@ class TaskManager:
             Task: The newly created Task object.
         """
         TaskManager.next_id += 1
-        task = Task(TaskManager.next_id, title, description, category, due_date,
-                    Priority(priority))
+
+        if priority not in Priority.list():
+            raise InvalidPriority(priority)
+        task = Task(TaskManager.next_id, title, description,
+                    category, due_date, Priority(priority))
         self.tasks.append(task)
         self._save_tasks()
         return task
@@ -135,7 +138,7 @@ class TaskManager:
         """
         return next((task for task in self.tasks if task.id == task_id), None)
 
-    def search_tasks(self, keyword=None, category=None, status=None) -> list[Task]:
+    def find_task(self, keyword=None, category=None, status=None) -> list[Task]:
         """
         Searches for tasks based on keyword, category, or status.
 

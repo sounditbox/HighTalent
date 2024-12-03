@@ -6,9 +6,13 @@ class TaskNotFound(TaskManagerException):
     message = 'Задача не найдена'
 
 
-class DateTimeException(TaskManagerException):
-    pass
+class TaskAlreadyCompleted(TaskManagerException):
+    message = 'Задача уже выполнена'
 
 
-class InvalidDate(DateTimeException):
+class InvalidPriority(TaskManagerException):
+    message = 'Неверная приоритетность задачи'
+
+
+class InvalidDate(TaskManagerException):
     pass
