@@ -1,7 +1,9 @@
 import json
 import os
+from datetime import datetime
 
-from exceptions import TaskNotFound, InvalidPriority
+from constants import DATE_FORMAT
+from exceptions import TaskNotFound, InvalidPriority, InvalidDate
 from priority import Priority
 from task import Task
 
@@ -71,11 +73,14 @@ class TaskManager:
 
         Returns:
             Task: The newly created Task object.
-        """
-        TaskManager.next_id += 1
 
-        if priority not in Priority.list():
-            raise InvalidPriority(priority)
+        Raises:
+            InvalidPriority: If the provided priority is not valid.
+            InvalidDate: If the provided due date is not valid.
+        """
+
+        TaskManager.next_id += 1
+        self.validate_data()
         task = Task(TaskManager.next_id, title, description,
                     category, due_date, Priority(priority))
         self.tasks.append(task)
@@ -184,3 +189,12 @@ class TaskManager:
         if 'category' in kwargs:
             return [task for task in self.tasks if task.category == kwargs['category']]
         return []
+
+    @staticmethod
+    def validate_data(priority, due_date):
+        if priority not in Priority.list():
+            raise InvalidPriority(priority)
+        try:
+            datetime.strptime(due_date, DATE_FORMAT)
+        except ValueError:
+            raise InvalidDate

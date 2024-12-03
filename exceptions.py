@@ -15,4 +15,4 @@ class InvalidPriority(TaskManagerException):
 
 
 class InvalidDate(TaskManagerException):
-    pass
+    message = 'Неверная дата выполнения задачи'

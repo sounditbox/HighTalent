@@ -3,7 +3,8 @@ import os
 
 from colorama import Style, Fore
 
-from constants import DELIMITER, BASE_EXCEPTION_MESSAGE
+from constants import DELIMITER, BASE_EXCEPTION_MESSAGE, COMMAND_PALETTE, \
+    ERROR_PALETTE
 from exceptions import TaskManagerException
 from task import Task
 from task_manager import TaskManager
@@ -21,6 +22,16 @@ class IOHandler:
         print('Пока-пока')
         exit()
 
+    @staticmethod
+    def print_(tasks: list[Task]):
+        if not tasks:
+            print(ERROR_PALETTE + 'Задачи не найдены.')
+
+        print(DELIMITER)
+        for task in tasks:
+            print(task)
+            print(DELIMITER)
+
     def get_tasks(self):
         tasks = self.tm.get_tasks()
         self.print_(tasks)
@@ -30,23 +41,12 @@ class IOHandler:
         tasks = self.tm.get_tasks_by(category=cat)
         self.print_(tasks)
 
-    @staticmethod
-    def print_(tasks: list[Task]):
-        if not tasks:
-            print('Задачи не найдены.')
-
-        print(DELIMITER)
-        for task in tasks:
-            print(task)
-            print(DELIMITER)
-
     def add_task(self, **kwargs):
         if not kwargs:
             title = input("Введите название: ")
             description = input("Введите описание: ")
             category = input("Введите категорию: ")
             due_date = input("Введите срок выполнения (ГГГГ-ММ-ДД): ")
-            due_date = datetime.datetime.strptime(due_date, '%Y-%m-%d')
             priority = input("Введите приоритет (Низкий, Средний, Высокий): ")
         else:
             title = kwargs.get('title')
@@ -146,7 +146,7 @@ class IOHandler:
 
             if action in actions:
                 description, func = actions[action]
-                print(Fore.GREEN + f'Действие: {description}')
+                print(COMMAND_PALETTE + f'Действие: {description}')
                 print(Fore.RESET)
                 func()
             else:
