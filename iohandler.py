@@ -1,4 +1,3 @@
-import datetime
 import os
 
 from colorama import Style, Fore
@@ -12,25 +11,6 @@ from task_manager import TaskManager
 
 class IOHandler:
     tm: TaskManager = TaskManager()
-
-    @staticmethod
-    def clear():
-        os.system('cls') if os.name == 'nt' else os.system('clear')
-
-    @staticmethod
-    def exit():
-        print('Пока-пока')
-        exit()
-
-    @staticmethod
-    def print_(tasks: list[Task]):
-        if not tasks:
-            print(ERROR_PALETTE + 'Задачи не найдены.')
-
-        print(DELIMITER)
-        for task in tasks:
-            print(task)
-            print(DELIMITER)
 
     def get_tasks(self):
         tasks = self.tm.get_tasks()
@@ -155,3 +135,22 @@ class IOHandler:
 
     def get_tasks_by(self, category):
         self.tm.get_tasks_by(category=category)
+
+    @staticmethod
+    def clear():
+        os.system('cls') if os.name == 'nt' else os.system('clear')
+
+    @staticmethod
+    def exit():
+        print('Пока-пока')
+        exit()
+
+    @staticmethod
+    def print_(tasks: list[Task]):
+        if not tasks:
+            print(ERROR_PALETTE + 'Задачи не найдены.')
+
+        print(DELIMITER)
+        for task in tasks:
+            print(task)
+            print(DELIMITER)

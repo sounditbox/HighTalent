@@ -19,7 +19,8 @@ class TaskManager:
             filename (str): The name of the file where tasks are stored. Defaults to 'tasks.json'.
         """
         self.filename = filename
-        self.tasks: list[Task] = self._load_tasks()
+        self.tasks: list[Task] = []
+        self.tasks = self._load_tasks()
 
     def _load_tasks(self) -> list[Task]:
         """
@@ -80,7 +81,7 @@ class TaskManager:
         """
 
         TaskManager.next_id += 1
-        self.validate_data()
+        self.validate_data(priority, due_date)
         task = Task(TaskManager.next_id, title, description,
                     category, due_date, Priority(priority))
         self.tasks.append(task)
